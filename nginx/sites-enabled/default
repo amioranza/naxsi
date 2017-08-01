@@ -1,0 +1,46 @@
+server {
+
+    listen 80;
+    listen 443 ssl;
+    root /var/www/html;
+
+    ssl on;
+    # to generate a self-signed certificate use the following command:
+    # sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/cert.key -out /etc/nginx/cert.crt
+    ssl_certificate /etc/nginx/ssl/mdcnet.ninja-cert.pem; # refer to you own certificate
+    ssl_certificate_key /etc/nginx/ssl/mdcnet.ninja-key.pem; # refer to your own certificate key
+
+
+   location / {
+
+      #Enable naxsi
+      SecRulesEnabled;
+      #Enable learning mode
+      LearningMode;
+      #Define where blocked requests go
+      DeniedUrl "/403.html";
+      #CheckRules, determining when naxsi needs to take action
+      CheckRule "$SQL >= 8" BLOCK;
+      CheckRule "$RFI >= 8" BLOCK;
+      CheckRule "$TRAVERSAL >= 6" BLOCK;
+      CheckRule "$EVADE >= 6" BLOCK;
+      CheckRule "$XSS >= 8" BLOCK;
+
+      #include /etc/naxsi/naxsi_whitelist.rules;
+
+      #proxy setup
+      #proxy_pass http://<YOUR_WEB_APPLICATION_URL>:<OPTIONAL_PORT_NUMBER>/;
+      #proxy_set_header Host $host;
+      #proxy_set_header X-Real-IP $remote_addr;
+      #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      #proxy_set_header X-Forwarded-Proto $scheme;
+
+    }
+
+    # error codes
+    #error_page   500 502 503 504  /50x.html;
+    location = /403.html {
+      return 403;
+    }
+
+}

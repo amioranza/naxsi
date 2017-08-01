@@ -1,0 +1,3 @@
+# put here the whitelisted rules to avoid blocking regular access
+# maybe you can add a different whilist for each site
+# just create a new list and adjust the nginx configuration

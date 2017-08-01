@@ -1,0 +1,78 @@
+version: '2'
+
+services:
+  waf-layer:
+    image: amioranza/naxsi
+    hostname: naxsi
+    restart: always
+    depends_on:
+      - es-layer
+    networks:
+        - waf-naxsi
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/sites-enabled/default:/etc/nginx/sites-enabled/default
+      - ./nginx/sites-enabled/app-01:/etc/nginx/sites-enabled/app-01
+      - ./nginx/sites-enabled/app-02:/etc/nginx/sites-enabled/app-02
+      - ./nginx/sites-enabled/app-03:/etc/nginx/sites-enabled/app-03
+      - ./naxsi_core.rules:/etc/naxsi/naxsi_core.rules
+
+  app-01:
+    image: ghost:alpine
+    hostname: ghost
+    restart: always
+    networks:
+      - waf-naxsi
+
+  app-02:
+    image: jenkins:alpine
+    hostname: jenkins
+    restart: always
+    networks:
+      - waf-naxsi
+
+  app-03:
+    image: redmine
+    hostname: redmine
+    restart: always
+    networks:
+      - waf-naxsi
+
+  es-layer:
+    image: elasticsearch
+    hostname: elasticsearch
+    restart: always
+    environment:
+      ES_JAVA_OPTS: "-Xms2g -Xmx2g"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - waf-naxsi
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  kbn-layer:
+    image: kibana
+    hostname: kibana
+    restart: always
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+      - kbndata:/usr/share/kibana/data
+    networks:
+      - waf-naxsi
+    ports:
+      - "5601:5601"
+volumes:
+  esdata:
+  kbndata:
+
+networks:
+  waf-naxsi:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 192.168.69.0/24
