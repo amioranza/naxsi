@@ -26,8 +26,8 @@ server {
       #CheckRules, determining when naxsi needs to take action
       CheckRule "$SQL >= 8" BLOCK;
       CheckRule "$RFI >= 8" BLOCK;
-      CheckRule "$TRAVERSAL >= 6" BLOCK;
-      CheckRule "$EVADE >= 6" BLOCK;
+      CheckRule "$TRAVERSAL >= 4" BLOCK;
+      CheckRule "$EVADE >= 4" BLOCK;
       CheckRule "$XSS >= 8" BLOCK;
 
       #include /etc/naxsi/naxsi_whitelist.rules;

@@ -1,3 +1,45 @@
 # put here the whitelisted rules to avoid blocking regular access
 # maybe you can add a different whilist for each site
 # just create a new list and adjust the nginx configuration
+
+#### BASIC WHITE LIST ####
+
+# Allows most characters in Cookies
+# Without these rules basically no site will ever work
+# If your web app doesn't use cookies you can comment them out safely
+BasicRule wl:1000 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1001 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1005 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1007 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1010 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1011 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1013 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1015 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1100 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1101 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1314 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1315 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1306 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1310 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1311 "mz:$HEADERS_VAR:Cookie";
+BasicRule wl:1401 "mz:$HEADERS_VAR:Cookie";
+
+#  allows " in args
+BasicRule wl:1001 "mz:ARGS";
+
+#  allows ' in args
+BasicRule wl:1013 "mz:ARGS";
+
+# Allows -- in a URL
+BasicRule wl:1007 "mz:URL";
+
+# Allows ; in a URL - not great but used by some CMSs
+BasicRule wl:1008 "mz:URL";
+
+# Allows () in a URL
+BasicRule wl:1010 "mz:URL";
+BasicRule wl:1011 "mz:URL";
+
+# allows [ and ] in the URL arguments
+BasicRule wl:1310 "mz:ARGS";
+BasicRule wl:1311 "mz:ARGS";
