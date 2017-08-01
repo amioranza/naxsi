@@ -1,6 +1,0 @@
-mdcnet.ninja-cert.pem
-mdcnet.ninja-key.pem
-*.pem
-nginx/sites-enabled/app-01
-nginx/sites-enabled/app-02
-nginx/sites-enabled/app-03

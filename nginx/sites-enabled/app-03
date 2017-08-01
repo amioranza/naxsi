@@ -1,0 +1,45 @@
+server {
+
+    listen 80;
+    listen 443 ssl;
+    server_name redmine.mdcnet.ninja;
+    root /var/www/html;
+
+    ssl on;
+    ssl_certificate /etc/nginx/ssl/ssl-cert.pem;
+    ssl_certificate_key /etc/nginx/ssl/ssl-key.pem;
+
+
+   location / {
+
+      #Enable naxsi
+      SecRulesEnabled;
+      #Enable learning mode
+      LearningMode;
+      #Define where blocked requests go
+      DeniedUrl "/403.html";
+      #CheckRules, determining when naxsi needs to take action
+      CheckRule "$SQL >= 8" BLOCK;
+      CheckRule "$RFI >= 8" BLOCK;
+      CheckRule "$TRAVERSAL >= 6" BLOCK;
+      CheckRule "$EVADE >= 6" BLOCK;
+      CheckRule "$XSS >= 8" BLOCK;
+
+      include /etc/naxsi/naxsi_whitelist.rules;
+
+      #proxy setup
+      proxy_pass http://app-03:3000/;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+
+    }
+
+    # error codes
+    #error_page   500 502 503 504  /50x.html;
+    location = /403.html {
+      return 403;
+    }
+
+}

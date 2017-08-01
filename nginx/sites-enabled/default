@@ -7,8 +7,8 @@ server {
     ssl on;
     # to generate a self-signed certificate use the following command:
     # sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/cert.key -out /etc/nginx/cert.crt
-    ssl_certificate /etc/nginx/ssl/mdcnet.ninja-cert.pem; # refer to you own certificate
-    ssl_certificate_key /etc/nginx/ssl/mdcnet.ninja-key.pem; # refer to your own certificate key
+    ssl_certificate /etc/nginx/ssl/ssl-cert.pem; # refer to you own certificate
+    ssl_certificate_key /etc/nginx/ssl/ssl-key.pem; # refer to your own certificate key
 
 
    location / {

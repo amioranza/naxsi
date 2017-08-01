@@ -64,8 +64,8 @@ COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/sites-enabled /etc/nginx/sites-enabled
 COPY default.html /var/www/html/index.html
 COPY 403.html /var/www/html/403.html
-COPY mdcnet.ninja-cert.pem /etc/nginx/ssl/mdcnet.ninja-cert.pem
-COPY mdcnet.ninja-key.pem /etc/nginx/ssl/mdcnet.ninja-key.pem
+COPY ssl-cert.pem /etc/nginx/ssl/ssl-cert.pem
+COPY ssl-key.pem /etc/nginx/ssl/ssl-key.pem
 COPY naxsi/nxapi /opt/nxapi
 COPY naxsi_whitelist.rules /etc/naxsi/naxsi_whitelist.rules
 
