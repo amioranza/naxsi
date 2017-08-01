@@ -53,12 +53,10 @@ RUN cd nginx && ./configure \
     rm /usr/local/lib/libGeoIP.a && \
     rm -rf /var/cache/apk/*
 
-RUN ln -sf /dev/stdout /var/log/nginx/access.log
-#RUN ln -sf /dev/stderr /var/log/nginx/error.log
-
-RUN mkdir -p /etc/naxsi && cp /usr/src/naxsi/naxsi_config/naxsi_core.rules /etc/naxsi
-
-RUN mkfifo /var/log/nginx/error_pipe.log
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
+    mkdir -p /etc/naxsi && \
+    cp /usr/src/naxsi/naxsi_config/naxsi_core.rules /etc/naxsi && \
+    mkfifo /var/log/nginx/error_pipe.log
 
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/sites-enabled /etc/nginx/sites-enabled
@@ -68,16 +66,13 @@ COPY ssl-cert.pem /etc/nginx/ssl/ssl-cert.pem
 COPY ssl-key.pem /etc/nginx/ssl/ssl-key.pem
 COPY naxsi/nxapi /opt/nxapi
 COPY naxsi_whitelist.rules /etc/naxsi/naxsi_whitelist.rules
-
 COPY naxsi_startup.sh /
-RUN chmod +x /naxsi_startup.sh
 
-RUN cd /opt/nxapi && pip install -r requirements.txt && python setup.py install
+RUN chmod +x /naxsi_startup.sh && \
+    cd /opt/nxapi && pip install -r requirements.txt && python setup.py install
 
 EXPOSE 80 443
 
 WORKDIR /
 
-#ENTRYPOINT ["nginx", "-g", "daemon off;"]
-#CMD ["nginx", "-g", "daemon off;"]
 CMD ["/naxsi_startup.sh", "es-layer"]
