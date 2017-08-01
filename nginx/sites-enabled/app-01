@@ -1,6 +1,10 @@
 server {
-
     listen 80;
+    server_name ghost.mdcnet.ninja;
+    return 301 https://ghost.mdcnet.ninja$request_uri;
+}
+
+server {
     listen 443 ssl;
     server_name ghost.mdcnet.ninja;
     root /var/www/html;
