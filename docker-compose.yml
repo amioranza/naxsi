@@ -27,6 +27,8 @@ services:
     restart: always
     networks:
       - waf-naxsi
+    volumes:
+      - /tmp/ghost/data:/var/lib/ghost/content
 
   app-02:
     image: jenkins:alpine
@@ -41,6 +43,8 @@ services:
     restart: always
     networks:
       - waf-naxsi
+    volumes:
+      - /tmp/redmine/data:/usr/src/redmine/files
 
   es-layer:
     image: elasticsearch
