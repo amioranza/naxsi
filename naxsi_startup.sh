@@ -17,7 +17,7 @@ sleep 30
 
 if curl -XGET http://$host:9200/nxapi/ | grep '\"status\":404'; then
   echo "Creating nxapi elasticsearch index"
-  curl -XPUT http://$host:9200/nxapi/
+  curl -XPUT http://$host:9200/nxapi -d @/usr/src/es-index.json
 else
   echo "nxapi elasticsearch index exists"
 fi

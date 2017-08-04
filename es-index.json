@@ -1,0 +1,65 @@
+{
+  "mappings" : {
+    "events" : {
+      "properties" : {
+        "comments" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "content" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "coords" : {
+          "type" : "geo_point"
+        },
+        "country" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "date" : {
+          "type" : "date"
+        },
+        "id" : {
+          "type" : "integer"
+        },
+        "index" : {
+          "type" : "object"
+        },
+        "ip" : {
+          "type" : "ip"
+        },
+        "server" : {
+          "type" : "keyword"
+        },
+        "uri" : {
+          "type" : "keyword"
+        },
+        "var_name" : {
+          "type" : "keyword"
+        },
+        "whitelisted" : {
+          "type" : "keyword"
+        },
+        "zone" : {
+          "type" : "keyword"
+        }
+      }
+    }
+  }
+}

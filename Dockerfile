@@ -154,6 +154,7 @@ COPY 403.html /var/www/html/403.html
 COPY ssl-cert.pem /etc/nginx/ssl/ssl-cert.pem
 COPY ssl-key.pem /etc/nginx/ssl/ssl-key.pem
 COPY naxsi_whitelist.rules /etc/naxsi/naxsi_whitelist.rules
+COPY es-index.json ${WRKDIR}
 COPY naxsi_startup.sh /
 
 RUN chmod +x /naxsi_startup.sh
