@@ -3,6 +3,4 @@
 
 server.name: kibana
 server.host: "0"
-elasticsearch.url: http://es-layer:9200
-elasticsearch.username: elastic
-elasticsearch.password: changeme
+elasticsearch.url: http://elasticsearch:9200

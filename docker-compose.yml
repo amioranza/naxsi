@@ -1,12 +1,16 @@
 version: '2'
 
 services:
-  waf-layer:
+  waf:
     image: amioranza/naxsi
     hostname: naxsi
     restart: always
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:514"
     depends_on:
-      - es-layer
+      - elasticsearch
     networks:
         - waf-naxsi
     ports:
@@ -29,7 +33,7 @@ services:
     networks:
       - waf-naxsi
     volumes:
-      - /tmp/ghost/data:/var/lib/ghost/content
+      - ghost_data:/var/lib/ghost
 
   app-02:
     image: jenkins:alpine
@@ -37,6 +41,8 @@ services:
     restart: always
     networks:
       - waf-naxsi
+    volumes:
+      - jenkins_data:/var/jenkins_home/
 
   app-03:
     image: redmine
@@ -45,9 +51,9 @@ services:
     networks:
       - waf-naxsi
     volumes:
-      - /tmp/redmine/data:/usr/src/redmine/files
+      - redmine_data:/usr/src/redmine
 
-  es-layer:
+  elasticsearch:
     image: elasticsearch
     hostname: elasticsearch
     restart: always
@@ -61,7 +67,7 @@ services:
       - "9200:9200"
       - "9300:9300"
 
-  kbn-layer:
+  kibana:
     image: kibana
     hostname: kibana
     restart: always
@@ -73,21 +79,27 @@ services:
     ports:
       - "5601:5601"
 
-  lst-layer:
+  logstash:
     image: logstash:alpine
     hostname: logstash
     restart: always
-    command: ["-f", "/home/logstash"]
+    command: ["-f", "/home/logstash/logstash.conf"]
     volumes:
       - ./logstash:/home/logstash
       - lstdata:/usr/share/logstash/data
     networks:
       - waf-naxsi
+    ports:
+      - "514:5140/tcp"
+      - "514:5140/udp"
 
 volumes:
   esdata:
   kbndata:
   lstdata:
+  ghost_data:
+  jenkins_data:
+  redmine_data:
 
 networks:
   waf-naxsi:

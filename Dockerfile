@@ -25,7 +25,6 @@ RUN apk --update add \
         bash \
         build-base \
         ca-certificates \
-        collectd-log_logstash \
         curl \
         libxml2 \
         openssl \
@@ -58,6 +57,7 @@ RUN echo "" \
     && echo "##################  NXAPI INSTALL ##################" \
     && echo "" \
     && echo "" \
+    && sleep 1 \
     && cd /opt/nxapi \
     && pip install -r requirements.txt \
     && python setup.py install \
@@ -66,6 +66,7 @@ RUN echo "" \
     && echo "##################  GEOIP INSTALL ##################" \
     && echo "" \
     && echo "" \
+    && sleep 1 \
     && cd ${WRKDIR}/GeoIP-${GEOIP_VERSION} \
     && ./configure \
     && make \
@@ -76,6 +77,7 @@ RUN echo "" \
     && echo "##################  NGINX INSTALL ##################" \
     && echo "" \
     && echo "" \
+    && sleep 1 \
     && addgroup -S nginx \
     && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx \
     && cd ${WRKDIR}/nginx \
@@ -129,6 +131,7 @@ RUN echo "" \
     && echo "##################  CLEANUP BUILD PKGS AND SOURCES ##################" \
     && echo "" \
     && echo "" \
+    && sleep 1 \
     && apk del ${BUILD_PKGS} \
     && rm /usr/local/lib/libGeoIP.a \
     && rm -rf /var/cache/apk/* \
@@ -137,6 +140,7 @@ RUN echo "" \
     && echo "##################  MISC TASKS ##################" \
     && echo "" \
     && echo "" \
+    && sleep 1 \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && mkdir -p /etc/naxsi \
     && cp /usr/src/naxsi/naxsi_config/naxsi_core.rules /etc/naxsi \
@@ -163,4 +167,4 @@ EXPOSE 80 443
 
 WORKDIR /
 
-CMD ["/naxsi_startup.sh", "es-layer"]
+CMD ["/naxsi_startup.sh", "elasticsearch"]
