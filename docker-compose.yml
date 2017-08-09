@@ -24,7 +24,6 @@ services:
       - ./nginx/sites-enabled/app-03:/etc/nginx/sites-enabled/app-03
       - ./naxsi_core.rules:/etc/naxsi/naxsi_core.rules
       - ./naxsi_whitelist.rules:/etc/naxsi/naxsi_whitelist.rules
-      - ./collectd.conf:/etc/collectd/collectd.conf
 
   app-01:
     image: ghost:alpine
