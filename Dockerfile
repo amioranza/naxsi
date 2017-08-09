@@ -154,7 +154,7 @@ RUN echo "" \
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/sites-enabled /etc/nginx/sites-enabled
 COPY default.html /var/www/html/index.html
-COPY 403.html /var/www/html/403.html
+COPY 50x.html /var/www/html/50x.html
 COPY ssl-cert.pem /etc/nginx/ssl/ssl-cert.pem
 COPY ssl-key.pem /etc/nginx/ssl/ssl-key.pem
 COPY naxsi_whitelist.rules /etc/naxsi/naxsi_whitelist.rules

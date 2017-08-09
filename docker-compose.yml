@@ -33,7 +33,7 @@ services:
     networks:
       - waf-naxsi
     volumes:
-      - ghost_data:/var/lib/ghost
+      - ghost_data:/var/lib/ghost/content
 
   app-02:
     image: jenkins:alpine
@@ -106,4 +106,4 @@ networks:
     driver: bridge
     ipam:
       config:
-      - subnet: 192.168.69.0/24
+      - subnet: 10.157.57.0/24

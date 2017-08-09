@@ -21,7 +21,7 @@ server {
       #Enable learning mode
       LearningMode;
       #Define where blocked requests go
-      DeniedUrl "/403.html";
+      DeniedUrl "/50x.html";
       #CheckRules, determining when naxsi needs to take action
       CheckRule "$SQL >= 8" BLOCK;
       CheckRule "$RFI >= 8" BLOCK;
@@ -32,17 +32,17 @@ server {
       include /etc/naxsi/naxsi_whitelist.rules;
 
       #proxy setup
+      proxy_set_header  Host $host;
+      proxy_set_header  X-Real-IP $remote_addr;
+      proxy_set_header  X-Forwarded-Proto $scheme;
+      proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
       proxy_pass http://app-02:8080/;
-      proxy_set_header Host $host;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Forwarded-Proto $scheme;
 
     }
 
     # error codes
-    #error_page   500 502 503 504  /50x.html;
-    location = /403.html {
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
       return 403;
     }
 
