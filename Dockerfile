@@ -5,15 +5,21 @@ MAINTAINER Alexandre Mioranza <amioranza@mdcnet.ninja>
 ENV NGINX_VERSION nginx-1.13.3
 ENV NAXSI_VERSION 0.55.3
 ENV GEOIP_VERSION 1.6.9
+ENV MODSECURITY_VERSION 2.9.2
 ENV LANG C.UTF-8
 ENV LC_ALL=C
 ENV WRKDIR /usr/src
 ENV BUILD_PKGS="\
+        apache2-dev \
+        autoconf \
+        automake \
         gd-dev \
+        geoip-dev \
+        libressl-dev \
+        libtool \
         libxml2-dev \
         libxslt-dev \
         linux-headers \
-        openssl-dev \
         pcre-dev \
         perl-dev \
         python-dev \
@@ -22,17 +28,21 @@ ENV BUILD_PKGS="\
 WORKDIR ${WRKDIR}
 
 RUN apk --update add \
+        apr-util \
         bash \
         build-base \
         ca-certificates \
         curl \
+        git \
         libxml2 \
+        m4 \
         openssl \
         pcre \
         python \
         py-pip \
         py-geoip \
         py2-geoip \
+        unzip \
         zlib \
         ${BUILD_PKGS}
 
@@ -48,7 +58,15 @@ RUN curl -LJO http://nginx.org/download/${NGINX_VERSION}.tar.gz \
     && curl -LJO http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz \
     && gunzip GeoIP.dat.gz \
     && mkdir -p /usr/local/share/GeoIP/ \
-    && mv GeoIP.dat /usr/local/share/GeoIP/
+    && mv GeoIP.dat /usr/local/share/GeoIP/ \
+    && curl -LJO https://www.modsecurity.org/tarball/${MODSECURITY_VERSION}/modsecurity-${MODSECURITY_VERSION}.tar.gz \
+    && tar -xzvf modsecurity-${MODSECURITY_VERSION}.tar.gz \
+    && mv modsecurity-${MODSECURITY_VERSION} modsecurity \
+    && cd modsecurity \
+    && curl -LJO https://raw.githubusercontent.com/SpiderLabs/ModSecurity/master/modsecurity.conf-recommended \
+    && curl -LJO https://raw.githubusercontent.com/SpiderLabs/ModSecurity/v2/master/unicode.mapping \
+    && cd ${WRKDIR}
+
 
 COPY naxsi/nxapi /opt/nxapi
 
@@ -72,6 +90,18 @@ RUN echo "" \
     && make \
     && make check \
     && make install \
+    && pip install GeoIP \
+    && echo "" \
+    && echo "" \
+    && echo "##################  MODSECURITY INSTALL ##################" \
+    && echo "" \
+    && echo "" \
+    && sleep 1 \
+    && cd ${WRKDIR}/modsecurity \
+    && ./autogen.sh \
+    && ./configure --enable-standalone-module --disable-mlogc \
+    && make \
+    && make install \
     && echo "" \
     && echo "" \
     && echo "##################  NGINX INSTALL ##################" \
@@ -83,6 +113,7 @@ RUN echo "" \
     && cd ${WRKDIR}/nginx \
     && ./configure \
     --add-module=../naxsi/naxsi_src/ \
+    --add-module=${WRKDIR}/modsecurity/nginx/modsecurity \
     --prefix=/etc/nginx \
     --sbin-path=/usr/local/sbin/nginx \
     --conf-path=/etc/nginx/nginx.conf \
@@ -125,7 +156,6 @@ RUN echo "" \
     --with-ipv6 \
     && make \
     && make install \
-    && pip install GeoIP \
     && echo "" \
     && echo "" \
     && echo "##################  CLEANUP BUILD PKGS AND SOURCES ##################" \
@@ -145,6 +175,15 @@ RUN echo "" \
     && mkdir -p /etc/naxsi \
     && cp /usr/src/naxsi/naxsi_config/naxsi_core.rules /etc/naxsi \
     && mkfifo /var/log/nginx/error_pipe.log \
+    && cat ${WRKDIR}/modsecurity/modsecurity.conf-recommended  > /etc/nginx/modsecurity.conf \
+    && cp ${WRKDIR}/modsecurity/unicode.mapping /etc/nginx/ \
+    && cd /etc/nginx \
+    && git clone https://github.com/SpiderLabs/owasp-modsecurity-crs \
+    && mv owasp-modsecurity-crs/crs-setup.conf.example owasp-modsecurity-crs/crs-setup.conf \
+    && mv owasp-modsecurity-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example \
+          owasp-modsecurity-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf \
+    && mv owasp-modsecurity-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf.example \
+          owasp-modsecurity-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf \
     && echo "" \
     && echo "" \
     && echo "##################  COPYING FILES / TEMPLATES ##################" \
@@ -153,6 +192,7 @@ RUN echo "" \
 
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/sites-enabled /etc/nginx/sites-enabled
+COPY nginx/modsec_includes.conf /etc/nginx/modsec_includes.conf
 COPY default.html /var/www/html/index.html
 COPY 50x.html /var/www/html/50x.html
 COPY ssl-cert.pem /etc/nginx/ssl/ssl-cert.pem
