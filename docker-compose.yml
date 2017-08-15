@@ -1,56 +1,76 @@
-version: '2'
+version: "3"
 
 services:
   waf:
     image: amioranza/naxsi
     hostname: naxsi
     restart: always
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:514"
+    #logging:
+      #driver: syslog
+      #options:
+        #syslog-address: "tcp://localhost:514"
     depends_on:
       - elasticsearch
     networks:
-        - waf-naxsi
+        - waf-frontend
+        - waf-backend
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/sites-enabled/default:/etc/nginx/sites-enabled/default
-      - ./nginx/sites-enabled/app-01:/etc/nginx/sites-enabled/app-01
-      - ./nginx/sites-enabled/app-02:/etc/nginx/sites-enabled/app-02
-      - ./nginx/sites-enabled/app-03:/etc/nginx/sites-enabled/app-03
-      - ./naxsi_core.rules:/etc/naxsi/naxsi_core.rules
-      - ./naxsi_whitelist.rules:/etc/naxsi/naxsi_whitelist.rules
+    #volumes:
+      #- ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      #- ./nginx/sites-enabled/default:/etc/nginx/sites-enabled/default
+      #- ./nginx/sites-enabled/app-01:/etc/nginx/sites-enabled/app-01
+      #- ./nginx/sites-enabled/app-02:/etc/nginx/sites-enabled/app-02
+      #- ./nginx/sites-enabled/app-03:/etc/nginx/sites-enabled/app-03
+      #- ./naxsi_core.rules:/etc/naxsi/naxsi_core.rules
+      #- ./naxsi_whitelist.rules:/etc/naxsi/naxsi_whitelist.rules
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
 
   app-01:
     image: ghost:alpine
     hostname: ghost
     restart: always
     networks:
-      - waf-naxsi
+      - waf-backend
     volumes:
       - ghost_data:/var/lib/ghost/content
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
   app-02:
     image: jenkins:alpine
     hostname: jenkins
     restart: always
     networks:
-      - waf-naxsi
+      - waf-backend
     volumes:
       - jenkins_data:/var/jenkins_home/
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
   app-03:
     image: redmine
     hostname: redmine
     restart: always
     networks:
-      - waf-naxsi
+      - waf-backend
     volumes:
       - redmine_data:/usr/src/redmine
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
   elasticsearch:
     image: elasticsearch
@@ -59,50 +79,69 @@ services:
     environment:
       ES_JAVA_OPTS: "-Xms2g -Xmx2g"
     volumes:
-      - esdata:/usr/share/elasticsearch/data
+      - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
-      - waf-naxsi
+      - waf-backend
     ports:
       - "9200:9200"
-      - "9300:9300"
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
 
   kibana:
     image: kibana
     hostname: kibana
     restart: always
     volumes:
-      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
-      - kbndata:/usr/share/kibana/data
+      #- ./kibana.yml:/usr/share/kibana/config/kibana.yml
+      - kibana_data:/usr/share/kibana/data
     networks:
-      - waf-naxsi
+      - waf-backend
     ports:
       - "5601:5601"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
   logstash:
-    image: logstash:alpine
+    image: amioranza/logstash
     hostname: logstash
     restart: always
-    command: ["-f", "/home/logstash/logstash.conf"]
+    #command: ["-f", "/home/logstash/logstash.conf"]
     volumes:
-      - ./logstash:/home/logstash
-      - lstdata:/usr/share/logstash/data
+      #- ./logstash:/home/logstash
+      - logstash_data:/usr/share/logstash/data
     networks:
-      - waf-naxsi
+      - waf-backend
     ports:
       - "514:5140/tcp"
       - "514:5140/udp"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
 volumes:
-  esdata:
-  kbndata:
-  lstdata:
+  elasticsearch_data:
+  kibana_data:
+  logstash_data:
   ghost_data:
   jenkins_data:
   redmine_data:
 
 networks:
-  waf-naxsi:
-    driver: bridge
+  waf-frontend:
+    #driver: bridge
     ipam:
       config:
-      - subnet: 10.157.57.0/24
+      - subnet: 10.157.157.0/24
+  waf-backend:
+    #driver: bridge
+    ipam:
+      config:
+      - subnet: 10.158.158.0/24
