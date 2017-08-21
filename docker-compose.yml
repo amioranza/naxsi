@@ -1,14 +1,14 @@
-version: "3"
+version: "2"
 
 services:
   waf:
     image: amioranza/naxsi
     hostname: naxsi
     restart: always
-    #logging:
-      #driver: syslog
-      #options:
-        #syslog-address: "tcp://localhost:514"
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:514"
     depends_on:
       - elasticsearch
     networks:
@@ -17,21 +17,14 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    #volumes:
-      #- ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      #- ./nginx/sites-enabled/default:/etc/nginx/sites-enabled/default
-      #- ./nginx/sites-enabled/app-01:/etc/nginx/sites-enabled/app-01
-      #- ./nginx/sites-enabled/app-02:/etc/nginx/sites-enabled/app-02
-      #- ./nginx/sites-enabled/app-03:/etc/nginx/sites-enabled/app-03
-      #- ./naxsi_core.rules:/etc/naxsi/naxsi_core.rules
-      #- ./naxsi_whitelist.rules:/etc/naxsi/naxsi_whitelist.rules
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
-      restart_policy:
-        condition: on-failure
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/sites-enabled/default:/etc/nginx/sites-enabled/default
+      - ./nginx/sites-enabled/app-01:/etc/nginx/sites-enabled/app-01
+      - ./nginx/sites-enabled/app-02:/etc/nginx/sites-enabled/app-02
+      - ./nginx/sites-enabled/app-03:/etc/nginx/sites-enabled/app-03
+      - ./naxsi_core.rules:/etc/naxsi/naxsi_core.rules
+      - ./naxsi_whitelist.rules:/etc/naxsi/naxsi_whitelist.rules
 
   app-01:
     image: ghost:alpine
@@ -41,10 +34,6 @@ services:
       - waf-backend
     volumes:
       - ghost_data:/var/lib/ghost/content
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
 
   app-02:
     image: jenkins:alpine
@@ -54,10 +43,6 @@ services:
       - waf-backend
     volumes:
       - jenkins_data:/var/jenkins_home/
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
 
   app-03:
     image: redmine
@@ -67,10 +52,6 @@ services:
       - waf-backend
     volumes:
       - redmine_data:/usr/src/redmine
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
 
   elasticsearch:
     image: elasticsearch
@@ -84,47 +65,32 @@ services:
       - waf-backend
     ports:
       - "9200:9200"
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
-      restart_policy:
-        condition: on-failure
 
   kibana:
     image: kibana
     hostname: kibana
     restart: always
     volumes:
-      #- ./kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
       - kibana_data:/usr/share/kibana/data
     networks:
       - waf-backend
     ports:
       - "5601:5601"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
 
   logstash:
     image: amioranza/logstash
     hostname: logstash
     restart: always
-    #command: ["-f", "/home/logstash/logstash.conf"]
+    command: ["-f", "/home/logstash/logstash.conf"]
     volumes:
-      #- ./logstash:/home/logstash
+      - ./logstash:/home/logstash
       - logstash_data:/usr/share/logstash/data
     networks:
       - waf-backend
     ports:
       - "514:5140/tcp"
       - "514:5140/udp"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
 
 volumes:
   elasticsearch_data:
