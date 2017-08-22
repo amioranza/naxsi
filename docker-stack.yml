@@ -24,6 +24,11 @@ services:
         mode: 0440
         uid: '100'
         gid: '101'
+      - source: plan-hom-conf
+        target: /etc/nginx/sites-enabled/plan-hom.conf
+        mode: 0440
+        uid: '100'
+        gid: '101'
     deploy:
       placement:
         constraints: [node.role == worker]
@@ -175,4 +180,6 @@ configs:
   nginx-conf:
     external: true
   ghost-conf:
+    external: true
+  plan-hom-conf:
     external: true
