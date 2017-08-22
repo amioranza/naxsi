@@ -13,6 +13,17 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    configs:
+      - source: nginx-conf
+        target: /etc/nginx/nginx.conf
+        mode: 0440
+        uid: '100'
+        gid: '101'
+      - source: ghost-conf
+        target: /etc/nginx/sites-enabled/ghost.conf
+        mode: 0440
+        uid: '100'
+        gid: '101'
     deploy:
       placement:
         constraints: [node.role == worker]
@@ -99,7 +110,7 @@ services:
     networks:
       - waf-backend
     ports:
-      - "5601:5601"
+      - "8008:5601"
     deploy:
       placement:
         constraints: [node.role == worker]
@@ -160,3 +171,8 @@ networks:
     ipam:
       config:
       - subnet: 10.158.158.0/24
+configs:
+  nginx-conf:
+    external: true
+  ghost-conf:
+    external: true
