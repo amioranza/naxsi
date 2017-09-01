@@ -69,21 +69,6 @@ services:
       restart_policy:
         condition: on-failure
 
-  app-03:
-    image: redmine
-    hostname: redmine
-    restart: always
-    networks:
-      - waf-backend
-    volumes:
-      - redmine_data:/usr/src/redmine
-    deploy:
-      placement:
-        constraints: [node.role == worker]
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-
   elasticsearch:
     image: elasticsearch
     hostname: elasticsearch
@@ -162,10 +147,6 @@ volumes:
     driver: nfs
     driver_opts:
       share: swarm-node01:/data/docker/volumes/jenkins_data
-  redmine_data:
-    driver: nfs
-    driver_opts:
-      share: swarm-node01:/data/docker/volumes/redmine_data
 
 networks:
   waf-frontend:

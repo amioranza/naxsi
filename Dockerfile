@@ -191,7 +191,7 @@ RUN echo "" \
     && echo ""
 
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
-COPY nginx/sites-enabled /etc/nginx/sites-enabled
+COPY nginx/sites-enabled/default /etc/nginx/sites-enabled/default
 COPY nginx/modsec_includes.conf /etc/nginx/modsec_includes.conf
 COPY default.html /var/www/html/index.html
 COPY 50x.html /var/www/html/50x.html
