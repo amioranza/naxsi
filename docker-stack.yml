@@ -19,12 +19,12 @@ services:
         mode: 0440
         uid: '100'
         gid: '101'
-      - source: ghost-conf
+      - source: ghost-conf-v2
         target: /etc/nginx/sites-enabled/ghost.conf
         mode: 0440
         uid: '100'
         gid: '101'
-      - source: plan-hom-conf
+      - source: plan-hom-conf-v3
         target: /etc/nginx/sites-enabled/plan-hom.conf
         mode: 0440
         uid: '100'
@@ -160,7 +160,7 @@ networks:
 configs:
   nginx-conf:
     external: true
-  ghost-conf:
+  ghost-conf-v2:
     external: true
-  plan-hom-conf:
+  plan-hom-conf-v3:
     external: true
